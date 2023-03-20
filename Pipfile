@@ -10,6 +10,7 @@ langchain = "*"
 openai = "*"
 google-search-results = "*"
 google-api-python-client = "*"
+forever = "*"
 
 [dev-packages]
 pylint = "*"
@@ -19,6 +20,7 @@ black = "*"
 python_version = "3.9"
 
 [scripts]
-start = "python3 src/app.py"
+start = "npx forever start --uid 'chatgpt' -l output.log -c python3 src/app.py"
+stop = "npx forever stop chatgpt"
 format = "pysen"
 lint = "pysen"
