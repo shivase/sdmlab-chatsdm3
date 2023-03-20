@@ -10,18 +10,20 @@ agents = Agents()
 
 def process_event(event, say, memory_key):
     text: str = event['text']
+    thread_ts = event.get("thread_ts", None) or event["ts"]
+
 
     if text.startswith('initial'):
         agents.set_prompt(text)
-        say(text='system定義を設定しました')
+        say(text='system定義を設定しました',  thread_ts=thread_ts)
     elif text == 'reset':
         agents.delete(memory_key)
-        say(text='会話をリセットしました')
+        say(text='会話をリセットしました',  thread_ts=thread_ts)
     else:
         agent = agents.get(memory_key)
         res = agent.run(input=text)
 
-        say(text=res)
+        say(text=res, thread_ts=thread_ts)
 
 if __name__ == "__main__":
 
