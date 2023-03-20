@@ -7,6 +7,9 @@ name = "pypi"
 slack-bolt = "*"
 python-dotenv = "*"
 langchain = "*"
+openai = "*"
+google-search-results = "*"
+google-api-python-client = "*"
 
 [dev-packages]
 pylint = "*"

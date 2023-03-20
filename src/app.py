@@ -1,36 +1,27 @@
 import os
 from slack_bolt import App
 from dotenv import load_dotenv
-from langchain.chains import ConversationChain
-from langchain.llms import OpenAI
 
-from Memories import Memories
-from Prompt import Prompt
+from Agents import Agents
 
 load_dotenv()
 
-model = OpenAI(open_ai_api_key=os.environ['OPEN_API_KEY'], temperature=0.9)
-
-prompt = Prompt()
-memories = Memories()
+agents = Agents()
 
 def process_event(event, say, memory_key):
-    text = event['text']
+    text: str = event['text']
 
     if text.startswith('initial'):
-        prompt.set(text)
+        agents.set_prompt(text)
         say(text='system定義を設定しました')
+    elif text == 'reset':
+        agents.delete(memory_key)
+        say(text='会話をリセットしました')
     else:
-        memory = memories.get_memory(memory_key)
-        chain = ConversationChain(memory=memory, prompt=prompt.get(), llm=model)
-        res = chain.call(input=text)
+        agent = agents.get(memory_key)
+        res = agent.run(input=text)
 
-        say(text=res.response)
-
-        if len(memory.chat_history.messages) > 20:
-            memories.delete_memory(memory_key)
-            say(text='(system) 会話制限（20回)に到達したため、履歴は削除されました')
-
+        say(text=res)
 
 if __name__ == "__main__":
 
