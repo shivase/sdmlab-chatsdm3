@@ -15,7 +15,7 @@ class Agents:
         self.model = ChatOpenAI(openai_api_key=os.environ['OPENAI_API_KEY'],
                         model_name='gpt-3.5-turbo',
                         request_timeout=6,
-                        max_tokens=4000,
+                        max_tokens=3000,
                         temperature=0.9)
 
         search = GoogleSearchAPIWrapper()
