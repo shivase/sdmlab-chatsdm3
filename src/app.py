@@ -2,28 +2,29 @@ import os
 from slack_bolt import App
 from dotenv import load_dotenv
 
-from Agents import Agents
+from conversation_agent import ConversationAgent
 
 load_dotenv()
-
-agents = Agents()
+agent = ConversationAgent()
 
 def process_event(event, say, memory_key):
     text: str = event['text']
     thread_ts = event.get("thread_ts", None) or event["ts"]
 
-
     if text.startswith('initial'):
-        agents.set_prompt(text)
+        agent.set_prompt(text)
         say(text='system定義を設定しました',  thread_ts=thread_ts)
     elif text == 'reset':
-        agents.delete(memory_key)
+        agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
     else:
-        agent = agents.get(memory_key)
-        res = agent.run(input=text)
-
-        say(text=res, thread_ts=thread_ts)
+        try:
+            executor = agent.get_executor(memory_key)
+            res = executor.run(input=text)
+            say(text=res, thread_ts=thread_ts)
+        except Exception as error:
+            print(error)
+            say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
 if __name__ == "__main__":
 
