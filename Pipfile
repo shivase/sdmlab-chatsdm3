@@ -10,7 +10,6 @@ langchain = "*"
 openai = "*"
 google-search-results = "*"
 google-api-python-client = "*"
-forever = "*"
 tiktoken = "*"
 
 [dev-packages]
