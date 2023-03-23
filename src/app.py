@@ -13,7 +13,7 @@ def process_event(event, say, memory_key):
 
     if text.startswith('initial'):
         agent.set_prefix(text)
-        say(text='system定義を設定しました',  thread_ts=thread_ts)
+        say(text='system prefix定義を設定しました。反映させるには会話をresetで終了して下さい',  thread_ts=thread_ts)
     elif text == 'reset':
         agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
