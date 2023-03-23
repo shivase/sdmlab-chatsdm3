@@ -12,22 +12,17 @@ def process_event(event, say, memory_key):
     thread_ts = event.get("thread_ts", None) or event["ts"]
 
     if text.startswith('initial'):
-        agent.set_prompt(text)
+        agent.set_prefix(text)
         say(text='system定義を設定しました',  thread_ts=thread_ts)
     elif text == 'reset':
         agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
     else:
-        try:
-            executor = agent.get_executor(memory_key)
-            res = executor.run(input=text)
-            say(text=res, thread_ts=thread_ts)
-        except Exception as error:
-            print(error)
-            say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
+        executor = agent.get_executor(memory_key)
+        res = executor.run(input=text)
+        say(text=res, thread_ts=thread_ts)
 
 if __name__ == "__main__":
-
     slack = App(
         token=os.environ.get("SLACK_BOT_TOKEN"),
         signing_secret=os.environ.get("SLACK_SIGNING_SECRET")

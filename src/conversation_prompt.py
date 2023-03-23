@@ -1,5 +1,11 @@
+
+import os
+from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain.agents import ConversationalAgent
+
+load_dotenv()
+SYSTEM_PREFIX_FILE=os.environ.get("SYSTEM_PREFIX_FILE")
 
 SUMMARY_TEMPLATE = """
 会話内容を順次要約し、前回の要約に追加して新たな要約を返してください。
@@ -30,9 +36,12 @@ class ConversationPrompt:
         self.tools = tools
 
     def conversation(self):
+        system_file = self.get_system_prefix()
+        prefix = f"{system_file}\n{CONVERSATION_PREFIX}"
+
         return ConversationalAgent.create_prompt(
             self.tools,
-            prefix=CONVERSATION_PREFIX,
+            prefix=prefix,
             suffix=CONVERSATION_SUFFIX,
             input_variables=["input", "chat_history", "agent_scratchpad"]
         )
@@ -43,13 +52,16 @@ class ConversationPrompt:
             input_variables=['summary', 'new_lines',]
         )
 
-    def set(self, text):
-        with open('initial.txt', 'w', encoding='UTF-8') as f:
-            f.write(self.remove_heads(text, 1))
+    def set_system_prefix(self, text):
+        with open(SYSTEM_PREFIX_FILE, 'w', encoding='UTF-8') as system_prefix_file:
+            system_prefix_file.write(self.remove_heads(text, 1))
 
-    def initial_file_sync_read(self):
-        with open('initial.txt', 'r', encoding="UTF-8") as f:
-            return f.read()
+    def get_system_prefix(self):
+        if os.path.exists(SYSTEM_PREFIX_FILE) :
+            with open(SYSTEM_PREFIX_FILE, 'r', encoding="UTF-8") as system_prefix_file:
+                return system_prefix_file.read()
+        else:
+            return ''
 
     def remove_heads(self, string, num):
         return '\n'.join(string.split('\n')[num:])

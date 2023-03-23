@@ -44,8 +44,8 @@ class ConversationAgent:
         self.tool_names = [tool.name for tool in self.tools]
         self.prompt = ConversationPrompt(self.tools)
 
-    def set_prompt(self, prompt):
-        self.prompt.set(prompt)
+    def set_prefix(self, prompt):
+        self.prompt.set_system_prefix(prompt)
 
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
