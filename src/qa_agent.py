@@ -57,13 +57,12 @@ class QAAgent:
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
 
-            doc_chain = load_qa_chain(self.qa_llm, chain_type="stuff", prompt=self.prompt.q_a())
-            question_generator = LLMChain(llm=self.qa_llm, prompt=CONDENSE_QUESTION_PROMPT)
-            qa = ChatVectorDBChain(
+            qa = ChatVectorDBChain.from_llm(
+                llm=self.qa_llm,
+                chain_type="stuff",
                 vectorstore=self.vectorstore,
-                combine_docs_chain=doc_chain,
-                question_generator=question_generator,
-                output_key='llm_chain',
+                qa_prompt=self.prompt.q_a(),
+                condense_question_prompt=CONDENSE_QUESTION_PROMPT,
                 verbose=True,
             )
 
