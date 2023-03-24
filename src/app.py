@@ -43,8 +43,6 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
         headers={"Authorization": f"Bearer {auth}"},
     )
 
-    logging.warning(download_file.status_code)
-
     filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:
         file.write(download_file.content)
@@ -64,6 +62,7 @@ if __name__ == "__main__":
             name = event["files"][0]["name"];
             url = event["files"][0]["url_private_download"]
             filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
+            say(text='ファイルを登録しています。しばらくお待ちください', thread_ts=thread_ts)
             agent.add_document(filename)
             say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
         except Exception as error:
