@@ -20,6 +20,7 @@ agent = QAAgent();
 def process_event(event, say, memory_key):
     text: str = event['text']
     thread_ts = event.get("thread_ts", None) or event["ts"]
+    files = event["files"]
 
     if text.startswith('initial'):
         agent.set_prefix(text)
@@ -27,6 +28,13 @@ def process_event(event, say, memory_key):
     elif text == 'reset':
         agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
+    elif files:
+        name = files[0]["name"];
+        url  = files[0]["url_private_download"]
+        filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
+        say(text='ファイルを登録しています。しばらくお待ちください', thread_ts=thread_ts)
+        agent.add_document(filename)
+        say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
     else:
         try:
             executor = agent.get_executor(memory_key)
@@ -54,20 +62,6 @@ if __name__ == "__main__":
         token=SLACK_BOT_TOKEN,
         signing_secret=SLACK_SIGNING_SECRET
     )
-
-    @slack.event({"type": "message", "subtype": "file_share"})
-    def file_share(event, say):
-        thread_ts = event.get("thread_ts", None) or event["ts"]
-        try:
-            name = event["files"][0]["name"];
-            url = event["files"][0]["url_private_download"]
-            filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
-            say(text='ファイルを登録しています。しばらくお待ちください', thread_ts=thread_ts)
-            agent.add_document(filename)
-            say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
-        except Exception as error:
-            print(error)
-            say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
     @slack.event("message")
     def handle_message(body, say):
