@@ -11,6 +11,8 @@ openai = "*"
 google-search-results = "*"
 google-api-python-client = "*"
 tiktoken = "*"
+beautifulsoup4 = "*"
+faiss-cpu = "*"
 
 [dev-packages]
 pylint = "*"

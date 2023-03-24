@@ -39,16 +39,13 @@ class DocumentLoader:
         loader = DirectoryLoader(target, glob="**/[!.]*.pdf", loader_cls=loader_cls, silent_errors=True)
 
         raw_documents = loader.load()
+        print(raw_documents)
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,
         )
 
         documents = text_splitter.split_documents(raw_documents)
-        text = ""
-        for doc in documents:
-            text += doc.page_content.replace("\n", " ")
-
         embeddings = OpenAIEmbeddings()
         vectorstore = FAISS.from_documents(documents, embeddings)
 
