@@ -36,8 +36,6 @@ def process_event(event, say, memory_key):
             say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
 def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
-    print(file_name)
-    print(download_url)
     download_file = requests.get(
         download_url,
         timeout=30,
@@ -46,8 +44,7 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
         stream=True,
     ).content
 
-    filename = f"{DOCUMENT_PATH}/{file_name}"
-    print(filename)
+    filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:
         file.write(download_file)
 
