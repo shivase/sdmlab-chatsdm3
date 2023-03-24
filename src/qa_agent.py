@@ -26,7 +26,7 @@ class QAAgent:
                             openai_api_key=os.environ['OPENAI_API_KEY'],
                             model_name='gpt-3.5-turbo',
                             verbose=True,
-                            request_timeout=10,
+                            request_timeout=30,
                             max_retries=2,
                             temperature=0.9)
         self.tools = [
