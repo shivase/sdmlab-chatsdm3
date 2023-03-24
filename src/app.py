@@ -21,8 +21,8 @@ def process_event(event, say, memory_key):
         say(text='会話をリセットしました',  thread_ts=thread_ts)
     else:
         executor = agent.get_executor(memory_key)
-        res = executor.run(input=text)
-        say(text=res, thread_ts=thread_ts)
+        res = executor({"question": text , "chat_history": []})
+        say(text=res['answer'], thread_ts=thread_ts)
 
 if __name__ == "__main__":
     slack = App(

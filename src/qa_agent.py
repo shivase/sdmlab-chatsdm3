@@ -57,26 +57,25 @@ class QAAgent:
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
 
-            qa = ChatVectorDBChain.from_llm(
+            self.agents[idx] = ChatVectorDBChain.from_llm(
                 llm=self.qa_llm,
                 chain_type="stuff",
                 vectorstore=self.vectorstore,
                 qa_prompt=self.prompt.q_a(),
                 condense_question_prompt=CONDENSE_QUESTION_PROMPT,
-                output_value='llm_chain',
                 verbose=True,
             )
 
-            self.agents[idx] = AgentExecutor.from_agent_and_tools(
-                agent=ConversationalAgent(
-                        llm_chain=qa,
-                        allowed_tools=self.tool_names),
-                memory=ConversationSummaryMemory(
-                                    llm=self.summary_llm,
-                                    memory_key='chat_history',
-                                    prompt=self.prompt.summary(),
-                                    return_messages=True),
-                tools=self.tools)
+            #self.agents[idx] = AgentExecutor.from_agent_and_tools(
+            #    agent=ConversationalAgent(
+            #            llm_chain=qa,
+            #            allowed_tools=self.tool_names),
+            #    memory=ConversationSummaryMemory(
+            #                        llm=self.summary_llm,
+            #                        memory_key='chat_history',
+            #                        prompt=self.prompt.summary(),
+            #                        return_messages=True),
+            #    tools=self.tools)
 
         return self.agents[idx]
 
