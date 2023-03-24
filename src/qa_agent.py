@@ -63,6 +63,7 @@ class QAAgent:
                 vectorstore=self.vectorstore,
                 qa_prompt=self.prompt.q_a(),
                 condense_question_prompt=CONDENSE_QUESTION_PROMPT,
+                output_value='llm_chain',
                 verbose=True,
             )
 
