@@ -14,6 +14,7 @@ tiktoken = "*"
 beautifulsoup4 = "*"
 faiss-cpu = "*"
 unstructured = {extras = ["local-inference"], version = "*"}
+pymupdf = "*"
 
 [dev-packages]
 pylint = "*"
