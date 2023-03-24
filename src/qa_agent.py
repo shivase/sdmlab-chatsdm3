@@ -25,7 +25,7 @@ class QAAgent:
         self.qa_llm = ChatOpenAI(
                             openai_api_key=os.environ['OPENAI_API_KEY'],
                             model_name='gpt-3.5-turbo',
-                            max_tokens=1500,
+                            max_tokens=1000,
                             verbose=True,
                             request_timeout=5,
                             max_retries=3,
