@@ -13,7 +13,7 @@ google-api-python-client = "*"
 tiktoken = "*"
 beautifulsoup4 = "*"
 faiss-cpu = "*"
-unstructured = "*"
+unstructured = {extras = ["local-inference"], version = "*"}
 
 [dev-packages]
 pylint = "*"
