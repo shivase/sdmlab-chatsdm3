@@ -39,14 +39,12 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
     download_file = requests.get(
         download_url,
         timeout=30,
-        allow_redirects=True,
         headers={"Authorization": f"Bearer {auth}"},
-        stream=True,
-    ).content
+    )
 
     filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:
-        file.write(download_file)
+        file.write(download_file.content)
 
     return filename
 
