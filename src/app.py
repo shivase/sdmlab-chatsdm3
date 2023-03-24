@@ -3,9 +3,11 @@ from slack_bolt import App
 from dotenv import load_dotenv
 
 from conversation_agent import ConversationAgent
+from qa_agent import QAAgent
 
 load_dotenv()
-agent = ConversationAgent()
+#agent = ConversationAgent()
+agent = QAAgent();
 
 def process_event(event, say, memory_key):
     text: str = event['text']

@@ -30,6 +30,11 @@ Human: {input}
 AI: {agent_scratchpad}
 """
 
+QA_TEMPLATE = """Use the following pieces of context to answer the question at the end.
+{context}
+Question: {question}
+Helpful Answer:"""
+
 class ConversationPrompt:
 
     def __init__(self,tools):
@@ -51,6 +56,9 @@ class ConversationPrompt:
             template=SUMMARY_TEMPLATE,
             input_variables=['summary', 'new_lines',]
         )
+
+    def q_a(self):
+        return PromptTemplate(template=QA_TEMPLATE, input_variables=["context", "question"])
 
     def set_system_prefix(self, text):
         with open(SYSTEM_PREFIX_FILE, 'w', encoding='UTF-8') as system_prefix_file:
