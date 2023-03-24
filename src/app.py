@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+import requests
 from slack_bolt import App
 from dotenv import load_dotenv
 
@@ -6,6 +8,11 @@ from conversation_agent import ConversationAgent
 from qa_agent import QAAgent
 
 load_dotenv()
+SLACK_BOT_USER_TOKEN=os.environ.get("SLACK_BOT_USER_TOKEN")
+SLACK_BOT_TOKEN=os.environ.get("SLACK_BOT_TOKEN")
+SLACK_SIGNING_SECRET=os.environ.get("SLACK_SIGNING_SECRET")
+DOCUMENT_PATH=os.environ.get("DOCUMENT_PATH");
+
 #agent = ConversationAgent()
 agent = QAAgent();
 
@@ -28,10 +35,25 @@ def process_event(event, say, memory_key):
             print(error)
             say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
+def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
+    download_file = requests.get(
+        download_url,
+        timeout=30,
+        allow_redirects=True,
+        headers={"Authorization": f"Bearer {auth}"},
+        stream=True,
+    ).content
+
+    filename = f"{DOCUMENT_PATH}/{file_name}"
+    with open(filename, "wb") as file:
+        file.write(download_file)
+
+    return filename
+
 if __name__ == "__main__":
     slack = App(
-        token=os.environ.get("SLACK_BOT_TOKEN"),
-        signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+        token=SLACK_BOT_TOKEN,
+        signing_secret=SLACK_SIGNING_SECRET
     )
 
     @slack.event("message")
@@ -44,5 +66,16 @@ if __name__ == "__main__":
         event = body['event']
         thread_ts = event.get('thread_ts', event['ts'])
         process_event(event, say, thread_ts)
+
+    @slack.event({"type": "message", "subtype": "file_share"})
+    def file_share(event, say):
+        thread_ts = event.get("thread_ts", None) or event["ts"]
+        filename = download_from_slack(
+            event["files"][0]["name"],
+            event["files"][0]["url_private_download"],
+            SLACK_BOT_USER_TOKEN
+        )
+        say(text=f'ファイルアップロード: {filename}', thread_ts=thread_ts)
+
 
     slack.start(port=int(os.environ.get("PORT")))

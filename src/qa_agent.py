@@ -46,9 +46,7 @@ class QAAgent:
             ]
         self.tool_names = [tool.name for tool in self.tools]
         self.prompt = ConversationPrompt(self.tools)
-        print("loading document...");
         self.vectorstore = DocumentLoader().load('document');
-        print("done loading document")
 
         self.chain = ChatVectorDBChain.from_llm(
                 llm=self.qa_llm,
