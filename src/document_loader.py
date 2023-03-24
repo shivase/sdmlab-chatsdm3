@@ -63,7 +63,8 @@ class DocumentLoader:
 
     def add_documents(self, file, loader_cls):
         logging.info("Loading documents from %s", file)
-        loader = FILE_LOADER_CLASSES[loader_cls](file)
+        loader_cls = FILE_LOADER_CLASSES[loader_cls]
+        loader = loader_cls(file)
         self.vectorized(loader)
         logging.info("Loading documents from %s finished", file)
         return self.vectorstore
