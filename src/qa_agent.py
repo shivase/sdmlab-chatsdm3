@@ -50,13 +50,7 @@ class QAAgent:
         self.vectorstore = DocumentLoader().load('document');
         print("done loading document")
 
-    def set_prefix(self, prompt):
-        self.prompt.set_system_prefix(prompt)
-
-    def get_executor(self, idx: int) -> AgentExecutor:
-        if idx not in self.agents:
-
-            self.agents[idx] = ChatVectorDBChain.from_llm(
+        self.chain = ChatVectorDBChain.from_llm(
                 llm=self.qa_llm,
                 chain_type="stuff",
                 vectorstore=self.vectorstore,
@@ -64,6 +58,14 @@ class QAAgent:
                 condense_question_prompt=CONDENSE_QUESTION_PROMPT,
                 verbose=True,
             )
+
+    def set_prefix(self, prompt):
+        self.prompt.set_system_prefix(prompt)
+
+    def get_executor(self, idx: int) -> AgentExecutor:
+        if idx not in self.agents:
+
+            self.agents[idx] = self.chain
 
             #self.agents[idx] = AgentExecutor.from_agent_and_tools(
             #    agent=ConversationalAgent(

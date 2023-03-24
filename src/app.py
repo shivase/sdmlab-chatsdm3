@@ -20,9 +20,13 @@ def process_event(event, say, memory_key):
         agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
     else:
-        executor = agent.get_executor(memory_key)
-        res = executor({"question": text , "chat_history": []})
-        say(text=res['answer'], thread_ts=thread_ts)
+        try:
+            executor = agent.get_executor(memory_key)
+            res = executor({"question": text , "chat_history": []})
+            say(text=res['answer'], thread_ts=thread_ts)
+        except Exception as error:
+            print(error)
+            say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
 if __name__ == "__main__":
     slack = App(
