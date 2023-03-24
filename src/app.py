@@ -20,7 +20,6 @@ agent = QAAgent();
 def process_event(event, say, memory_key):
     text: str = event['text']
     thread_ts = event.get("thread_ts", None) or event["ts"]
-    files = event["files"]
 
     if text.startswith('initial'):
         agent.set_prefix(text)
@@ -28,9 +27,9 @@ def process_event(event, say, memory_key):
     elif text == 'reset':
         agent.delete(memory_key)
         say(text='会話をリセットしました',  thread_ts=thread_ts)
-    elif files:
-        name = files[0]["name"];
-        url  = files[0]["url_private_download"]
+    elif "files" in event:
+        name = event['files'][0]["name"];
+        url  = event['files'][0]["url_private_download"]
         filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
         say(text='ファイルを登録しています。しばらくお待ちください', thread_ts=thread_ts)
         agent.add_document(filename)
