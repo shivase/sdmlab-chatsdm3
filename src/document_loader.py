@@ -32,7 +32,7 @@ DIR_LOADER_CLASSES = {
 
 
 load_dotenv()
-QA_VECTORSTORE_FILE=os.environ.get("QA_VECTORSTORE_FILE"),
+QA_VECTORSTORE_FILE=os.environ.get("QA_VECTORSTORE_FILE")
 
 class DocumentLoader:
 
