@@ -25,7 +25,6 @@ class QAAgent:
         self.qa_llm = ChatOpenAI(
                             openai_api_key=os.environ['OPENAI_API_KEY'],
                             model_name='gpt-3.5-turbo',
-                            max_tokens=1000,
                             verbose=True,
                             request_timeout=5,
                             max_retries=3,
@@ -59,7 +58,7 @@ class QAAgent:
 
             self.agents[idx] = ChatVectorDBChain.from_llm(
                 llm=self.qa_llm,
-                chain_type="refine",
+                chain_type="stuff",
                 vectorstore=self.vectorstore,
                 qa_prompt=self.prompt.q_a(),
                 condense_question_prompt=CONDENSE_QUESTION_PROMPT,
