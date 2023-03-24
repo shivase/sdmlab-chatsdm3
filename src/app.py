@@ -59,11 +59,15 @@ if __name__ == "__main__":
     @slack.event({"type": "message", "subtype": "file_share"})
     def file_share(event, say):
         thread_ts = event.get("thread_ts", None) or event["ts"]
-        name = event["files"][0]["name"];
-        url = event["files"][0]["url_private_download"]
-        filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
-        agent.add_document(filename)
-        say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
+        try:
+            name = event["files"][0]["name"];
+            url = event["files"][0]["url_private_download"]
+            filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
+            agent.add_document(filename)
+            say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
+        except Exception as error:
+            print(error)
+            say(text=f"Something Wrong Happened : {error}", thread_ts=thread_ts)
 
     @slack.event("message")
     def handle_message(body, say):

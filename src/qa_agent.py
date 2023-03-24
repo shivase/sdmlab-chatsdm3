@@ -53,7 +53,7 @@ class QAAgent:
         self.prompt.set_system_prefix(prompt)
 
     def add_document(self, filename):
-        self.vectorstore = DocumentLoader().add_documents(filename, 'pdf')
+        self.vectorstore = DocumentLoader().add_documents(filename, 'pymupdf')
 
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
