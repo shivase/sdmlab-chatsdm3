@@ -11,7 +11,7 @@ load_dotenv()
 SLACK_BOT_USER_TOKEN=os.environ.get("SLACK_BOT_USER_TOKEN")
 SLACK_BOT_TOKEN=os.environ.get("SLACK_BOT_TOKEN")
 SLACK_SIGNING_SECRET=os.environ.get("SLACK_SIGNING_SECRET")
-DOCUMENT_PATH=os.environ.get("DOCUMENT_PATH");
+DOCUMENT_PATH=os.environ.get("DOCUMENT_PATH")
 
 #agent = ConversationAgent()
 agent = QAAgent();
@@ -48,8 +48,6 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
     with open(filename, "wb") as file:
         file.write(download_file)
 
-    return filename
-
 if __name__ == "__main__":
     slack = App(
         token=SLACK_BOT_TOKEN,
@@ -59,12 +57,10 @@ if __name__ == "__main__":
     @slack.event({"type": "message", "subtype": "file_share"})
     def file_share(event, say):
         thread_ts = event.get("thread_ts", None) or event["ts"]
-        filename = download_from_slack(
-            event["files"][0]["name"],
-            event["files"][0]["url_private_download"],
-            SLACK_BOT_USER_TOKEN
-        )
-        say(text=f'ファイルアップロード: {filename}', thread_ts=thread_ts)
+        name = event["files"][0]["name"];
+        url = event["files"][0]["url_private_download"]
+        download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
+        say(text=f'ファイルアップロード: {name}', thread_ts=thread_ts)
 
     @slack.event("message")
     def handle_message(body, say):
