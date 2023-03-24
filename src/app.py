@@ -39,11 +39,11 @@ def process_event(event, say, memory_key):
 def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
     download_file = requests.get(
         download_url,
-        timeout=30,
+        timeout=10,
         headers={"Authorization": f"Bearer {auth}"},
     )
 
-    logging.warning(download_url)
+    logging.warning(download_file.status_code)
 
     filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:
