@@ -59,7 +59,7 @@ class QAAgent:
 
             self.agents[idx] = ChatVectorDBChain.from_llm(
                 llm=self.qa_llm,
-                chain_type="stuff",
+                chain_type="refine",
                 vectorstore=self.vectorstore,
                 qa_prompt=self.prompt.q_a(),
                 condense_question_prompt=CONDENSE_QUESTION_PROMPT,
