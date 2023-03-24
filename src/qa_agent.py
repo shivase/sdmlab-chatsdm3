@@ -47,6 +47,9 @@ class QAAgent:
             ]
         self.tool_names = [tool.name for tool in self.tools]
         self.prompt = ConversationPrompt(self.tools)
+        print("loading document...");
+        self.vectorstore = DocumentLoader().load('document');
+        print("done loading document")
 
     def set_prefix(self, prompt):
         self.prompt.set_system_prefix(prompt)
@@ -54,17 +57,19 @@ class QAAgent:
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
 
-            vectorstore = DocumentLoader().load('document');
-
             doc_chain = load_qa_chain(self.qa_llm, chain_type="stuff", prompt=self.prompt.q_a())
             question_generator = LLMChain(llm=self.qa_llm, prompt=CONDENSE_QUESTION_PROMPT)
             qa = ChatVectorDBChain(
-                vectorstore=vectorstore, combine_docs_chain=doc_chain, question_generator=question_generator, output_key='output'
+                vectorstore=self.vectorstore,
+                combine_docs_chain=doc_chain,
+                question_generator=question_generator,
+                verbose=True,
             )
 
             self.agents[idx] = AgentExecutor.from_agent_and_tools(
                 agent=ConversationalAgent(
                         llm_chain=qa,
+                        return_values=['llm_chain'],
                         allowed_tools=self.tool_names),
                 memory=ConversationSummaryMemory(
                                     llm=self.summary_llm,
