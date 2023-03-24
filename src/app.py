@@ -43,7 +43,7 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
         headers={"Authorization": f"Bearer {auth}"},
     )
 
-    logging.warning(download_file)
+    logging.warning(download_file.content)
 
     filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:
