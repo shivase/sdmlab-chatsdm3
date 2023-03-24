@@ -48,6 +48,8 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
     with open(filename, "wb") as file:
         file.write(download_file)
 
+    return filename
+
 if __name__ == "__main__":
     slack = App(
         token=SLACK_BOT_TOKEN,
@@ -59,8 +61,9 @@ if __name__ == "__main__":
         thread_ts = event.get("thread_ts", None) or event["ts"]
         name = event["files"][0]["name"];
         url = event["files"][0]["url_private_download"]
-        download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
-        say(text=f'ファイルアップロード: {name}', thread_ts=thread_ts)
+        filename = download_from_slack(name,url,SLACK_BOT_USER_TOKEN )
+        agent.add_document(filename)
+        say(text=f'ファイルアップロード: {name} succeeded', thread_ts=thread_ts)
 
     @slack.event("message")
     def handle_message(body, say):

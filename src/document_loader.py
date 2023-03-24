@@ -1,5 +1,6 @@
 
 import os
+import logging
 import pickle
 from dotenv import load_dotenv
 from langchain.embeddings import OpenAIEmbeddings
@@ -36,31 +37,50 @@ QA_VECTORSTORE_FILE=os.environ.get("QA_VECTORSTORE_FILE")
 
 class DocumentLoader:
 
+    singleton = None
     chunk_size = 1000
     chunk_overlap = 200
+    vectorstore = None
+
+    def __new__( cls, *args, **kwargs ):
+        if cls.singleton is None:
+            cls.singleton = super().__new__( cls )
+        return cls.singleton
+
+    def vectorized(self, loader):
+        raw_documents = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap,
+        )
+
+        documents =  text_splitter.split_documents(raw_documents)
+        if self.vectorstore is None:
+            embeddings = OpenAIEmbeddings()
+            self.vectorstore =  FAISS.from_documents(documents, embeddings)
+        else:
+            self.vectorstore.add_documents(documents)
+
+    def add_documents(self, file, loader_cls):
+        logging.info("Loading documents from %s", file)
+        loader_cls = FILE_LOADER_CLASSES[loader_cls]
+        loader = ReadTheDocsLoader(file)
+        self.vectorized(loader)
+        logging.info("Loading documents from %s finished", file)
+        return self.vectorstore
 
     def load(self,target):
 
         if os.path.exists(QA_VECTORSTORE_FILE):
             with open(QA_VECTORSTORE_FILE, "rb") as vector_file:
-                vectorstore = pickle.load(vector_file)
-                #vectorstore.add_documents(documents)
+                self.vectorstore = pickle.load(vector_file)
         else:
             loader_cls = UnstructuredPDFLoader
             loader = DirectoryLoader(target, glob="**/[!.]*.pdf", loader_cls=loader_cls, silent_errors=True)
 
-            raw_documents = loader.load()
-            print(raw_documents)
-            text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=self.chunk_size,
-                chunk_overlap=self.chunk_overlap,
-            )
-
-            documents = text_splitter.split_documents(raw_documents)
-            embeddings = OpenAIEmbeddings()
-            vectorstore = FAISS.from_documents(documents, embeddings)
+            self.vectorized(loader)
 
             with open(QA_VECTORSTORE_FILE, "wb") as vector_file:
-                pickle.dump(vectorstore, vector_file)
+                pickle.dump(self.vectorstore, vector_file)
 
-        return vectorstore
+        return self.vectorstore

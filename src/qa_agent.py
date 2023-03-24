@@ -13,6 +13,7 @@ from conversation_prompt import ConversationPrompt
 from document_loader import DocumentLoader
 
 load_dotenv()
+DOCUMENT_PATH=os.environ.get("DOCUMENT_PATH")
 
 class QAAgent:
 
@@ -46,24 +47,25 @@ class QAAgent:
             ]
         self.tool_names = [tool.name for tool in self.tools]
         self.prompt = ConversationPrompt(self.tools)
-        self.vectorstore = DocumentLoader().load('document');
 
-        self.chain = ChatVectorDBChain.from_llm(
-                llm=self.qa_llm,
-                chain_type="stuff",
-                vectorstore=self.vectorstore,
-                qa_prompt=self.prompt.q_a(),
-                condense_question_prompt=CONDENSE_QUESTION_PROMPT,
-                verbose=True,
-            )
 
     def set_prefix(self, prompt):
         self.prompt.set_system_prefix(prompt)
 
+    def add_document(self, filename):
+        DocumentLoader().add_documents(filename, 'pdf')
+
     def get_executor(self, idx: int) -> AgentExecutor:
         if idx not in self.agents:
-
-            self.agents[idx] = self.chain
+            vectorstore = DocumentLoader().load(DOCUMENT_PATH);
+            self.agents[idx] = ChatVectorDBChain.from_llm(
+                llm=self.qa_llm,
+                chain_type="stuff",
+                vectorstore=vectorstore,
+                qa_prompt=self.prompt.q_a(),
+                condense_question_prompt=CONDENSE_QUESTION_PROMPT,
+                verbose=True,
+            )
 
             #self.agents[idx] = AgentExecutor.from_agent_and_tools(
             #    agent=ConversationalAgent(
