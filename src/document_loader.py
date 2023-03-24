@@ -40,27 +40,27 @@ class DocumentLoader:
     chunk_overlap = 200
 
     def load(self,target):
-        loader_cls = UnstructuredPDFLoader
-        loader = DirectoryLoader(target, glob="**/[!.]*.pdf", loader_cls=loader_cls, silent_errors=True)
-
-        raw_documents = loader.load()
-        print(raw_documents)
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap,
-        )
-
-        documents = text_splitter.split_documents(raw_documents)
 
         if os.path.exists(QA_VECTORSTORE_FILE):
             with open(QA_VECTORSTORE_FILE, "rb") as vector_file:
                 vectorstore = pickle.load(vector_file)
                 #vectorstore.add_documents(documents)
         else:
+            loader_cls = UnstructuredPDFLoader
+            loader = DirectoryLoader(target, glob="**/[!.]*.pdf", loader_cls=loader_cls, silent_errors=True)
+
+            raw_documents = loader.load()
+            print(raw_documents)
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=self.chunk_size,
+                chunk_overlap=self.chunk_overlap,
+            )
+
+            documents = text_splitter.split_documents(raw_documents)
             embeddings = OpenAIEmbeddings()
             vectorstore = FAISS.from_documents(documents, embeddings)
 
-        with open(QA_VECTORSTORE_FILE, "wb") as vector_file:
-            pickle.dump(vectorstore, vector_file)
+            with open(QA_VECTORSTORE_FILE, "wb") as vector_file:
+                pickle.dump(vectorstore, vector_file)
 
         return vectorstore
