@@ -63,13 +63,13 @@ class QAAgent:
                 vectorstore=self.vectorstore,
                 combine_docs_chain=doc_chain,
                 question_generator=question_generator,
+                output_key='llm_chain',
                 verbose=True,
             )
 
             self.agents[idx] = AgentExecutor.from_agent_and_tools(
                 agent=ConversationalAgent(
                         llm_chain=qa,
-                        return_values=['llm_chain'],
                         allowed_tools=self.tool_names),
                 memory=ConversationSummaryMemory(
                                     llm=self.summary_llm,
