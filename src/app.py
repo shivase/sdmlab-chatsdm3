@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 import requests
 from slack_bolt import App
@@ -41,6 +42,8 @@ def download_from_slack(file_name: str, download_url: str, auth: str) -> str:
         timeout=30,
         headers={"Authorization": f"Bearer {auth}"},
     )
+
+    logging.warning(download_file)
 
     filename = DOCUMENT_PATH + "/" + file_name
     with open(filename, "wb") as file:

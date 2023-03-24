@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from langchain import LLMMathChain, LLMChain
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
