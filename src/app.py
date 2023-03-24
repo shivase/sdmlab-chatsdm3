@@ -56,6 +56,16 @@ if __name__ == "__main__":
         signing_secret=SLACK_SIGNING_SECRET
     )
 
+    @slack.event({"type": "message", "subtype": "file_share"})
+    def file_share(event, say):
+        thread_ts = event.get("thread_ts", None) or event["ts"]
+        filename = download_from_slack(
+            event["files"][0]["name"],
+            event["files"][0]["url_private_download"],
+            SLACK_BOT_USER_TOKEN
+        )
+        say(text=f'ファイルアップロード: {filename}', thread_ts=thread_ts)
+
     @slack.event("message")
     def handle_message(body, say):
         event = body['event']
@@ -67,15 +77,6 @@ if __name__ == "__main__":
         thread_ts = event.get('thread_ts', event['ts'])
         process_event(event, say, thread_ts)
 
-    @slack.event({"type": "message", "subtype": "file_share"})
-    def file_share(event, say):
-        thread_ts = event.get("thread_ts", None) or event["ts"]
-        filename = download_from_slack(
-            event["files"][0]["name"],
-            event["files"][0]["url_private_download"],
-            SLACK_BOT_USER_TOKEN
-        )
-        say(text=f'ファイルアップロード: {filename}', thread_ts=thread_ts)
 
 
     slack.start(port=int(os.environ.get("PORT")))
